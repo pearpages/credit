@@ -1,0 +1,24 @@
+---
+// The stylesheet is imported here so the component is self-contained: Astro's
+// build picks it up and the consumer writes nothing but <Credit />. The React
+// wrapper cannot do the same, since tsup would bundle the CSS into the JS.
+import "../../dist/credit.css";
+
+interface Props {
+  /**
+   * The element to render. Defaults to `footer`, matching the canonical markup.
+   * Pass `div` when the credit sits inside an existing `<footer>`.
+   */
+  as?: "footer" | "div";
+}
+
+const { as: Element = "footer" } = Astro.props;
+---
+
+<Element class="sk-author">
+  <p class="sk-author__credit">
+    <span class="sk-author__icon" aria-hidden="true"></span>
+    Made by <a href="https://pearpages.com">Pere Pages</a>
+  </p>
+  <slot />
+</Element>

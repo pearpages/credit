@@ -1,0 +1,57 @@
+/*
+ * @pearpages/credit — the shared "Made by Pere Pages" footer.
+ *
+ * Canonical source. Every consumer loads this same file, which is the point:
+ * Astro, React and plain HTML cannot drift from each other if they share it.
+ *
+ * Theming is two custom properties, no package API:
+ *   --sk-ink-soft   the footer text
+ *   --sk-accent     the link underline, and the link colour on hover
+ *
+ * The #667 fallbacks are correct on a light ground (5.63:1). On a dark ground
+ * they are not (3.36:1), so a dark site MUST set --sk-ink-soft itself.
+ */
+
+.sk-author {
+  padding: 20px 24px 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--sk-ink-soft, #667);
+}
+
+.sk-author__credit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 4px;
+}
+
+/* The pear rides in this file as a data URI, so no consumer has to resolve an
+   asset path. It is decorative; the markup marks it aria-hidden. */
+.sk-author__icon {
+  display: block;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: url("{{ICON}}") center / cover no-repeat;
+}
+
+.sk-author__credit a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration-color: var(--sk-accent, #667);
+}
+
+.sk-author__credit a:hover {
+  color: var(--sk-accent, #667);
+}
+
+/* Forced-colors mode drops background images, which would leave a 22px hole
+   plus its gap. The pear is decorative, so collapse it rather than show a gap. */
+@media (forced-colors: active) {
+  .sk-author__icon {
+    display: none;
+  }
+}

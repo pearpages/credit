@@ -1,0 +1,60 @@
+name: Publish to npm
+on:
+  push:
+    tags:
+      - "v*"              # e.g. v0.1.0
+
+permissions:
+  contents: read
+  id-token: write        # the OIDC token npm's trusted publishing exchanges for a credential
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history to check branch info
+      
+      - name: Check if tag is from main branch
+        id: check_branch
+        run: |
+          # Check if the commit that the tag points to is on main branch
+          if git merge-base --is-ancestor ${{ github.sha }} origin/main; then
+            echo "is_main_branch=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_main_branch=false" >> $GITHUB_OUTPUT
+            echo "::warning::Tag ${{ github.ref_name }} (${{ github.sha }}) is not an ancestor of origin/main - skipping publish. Tag a commit on main instead."
+          fi
+
+      # Trusted publishing needs Node >= 22.14 and npm >= 11.5.1; Node 22 still
+      # ships npm 10, hence the explicit npm upgrade below.
+      - uses: actions/setup-node@v4
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - name: Upgrade npm
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+        run: npm install -g npm@^11
+
+      - run: npm ci
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+      - run: npm run test:run
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+      - run: npm run lint
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+      - run: npm run build
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+      - name: Validate the package that will be published
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+        run: npm run check:package
+
+      # No NODE_AUTH_TOKEN: npm authenticates via OIDC against the trusted
+      # publisher configured on npmjs.com, and emits provenance by itself, so
+      # --provenance is redundant.
+      - name: Publish
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+        run: npm publish --access public

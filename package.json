@@ -1,0 +1,79 @@
+{
+  "name": "@pearpages/credit",
+  "version": "0.1.0",
+  "description": "The shared \"Made by Pere Pages\" footer: one stylesheet, plus thin React and Astro wrappers.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pearpages/credit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pearpages/credit/issues"
+  },
+  "homepage": "https://github.com/pearpages/credit#readme",
+  "type": "module",
+  "exports": {
+    "./credit.css": "./dist/credit.css",
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./astro": "./src/astro/Credit.astro",
+    "./icon.png": "./src/pearpages-icon.png",
+    "./icon.webp": "./src/pearpages-icon.webp"
+  },
+  "files": [
+    "dist",
+    "src/astro",
+    "src/pearpages-icon.png",
+    "src/pearpages-icon.webp"
+  ],
+  "style": "./dist/credit.css",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "tsup && node scripts/build-css.mjs",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "check:package": "publint && attw --pack . --profile esm-only --exclude-entrypoints credit.css astro icon.png icon.webp",
+    "prepublishOnly": "npm run build && npm run test:run && npm run check:package"
+  },
+  "peerDependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@types/jest-axe": "^3",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.3.0",
+    "jest-axe": "^10",
+    "jsdom": "^29.1.1",
+    "publint": "^0.3.12",
+    "tsup": "^8",
+    "typescript": "^5",
+    "typescript-eslint": "^8.39.1",
+    "vitest": "^2"
+  },
+  "allowScripts": {
+    "esbuild@0.27.7": true,
+    "esbuild@0.21.5": true
+  }
+}
