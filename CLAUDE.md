@@ -96,13 +96,19 @@ provenance badge on npmjs.com -- that starts with the first OIDC-published versi
 ## TODO
 
 - [x] Publish 0.1.0 manually (done, via `--auth-type=legacy`).
-- [ ] Attach OIDC (needs an OTP, so use the same legacy flag):
-      \`\`\`bash
-      npm trust github @pearpages/credit --file publish.yml \\
+- [ ] Attach OIDC. `npm trust` needs an OTP just like `npm publish`, so it takes the same
+      `--auth-type=legacy` workaround:
+
+      ```bash
+      npm trust github @pearpages/credit --file publish.yml \
         --repo pearpages/credit --allow-publish --auth-type=legacy
-      npm trust list @pearpages/credit          # verify
-      git push origin v0.1.0                    # then the tag; run should be green
-      \`\`\`
+      npm trust list @pearpages/credit     # verify it registered
+      git push origin v0.1.0               # then the tag; the run should be green
+      ```
+
+      Note what npm warns during this: *anyone with write access to the GitHub repo can
+      publish*. Fine for a solo public repo; reconsider if collaborators are ever added.
+
 - [ ] Step 2 — migrate orchard: six `AuthorCard` call sites (all pass taglines), then
       repoint the ten non-footer icon consumers at `@pearpages/credit/icon.png` and delete
       `packages/assets/pearpages-icon.png`. Re-run `pnpm sites:a11y`.
