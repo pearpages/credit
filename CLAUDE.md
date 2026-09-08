@@ -75,12 +75,28 @@ as a defensive measure. Check it in DevTools → Rendering if it ever matters.
 trusted publishing (OIDC) — no token in the repo — and skips greenly if the tag is not an
 ancestor of `main`.
 
-**0.1.0 must be published manually** (`npm publish --access public`): npm's trusted
-publisher is configured per-package on npmjs.com and the package must exist first.
+0.1.0 was published manually to bootstrap this: npm cannot attach a trusted publisher to a
+package that does not exist yet ([npm/cli#8544](https://github.com/npm/cli/issues/8544) is
+still open), so exactly one authenticated publish was unavoidable.
+
+**If you ever need to publish by hand again, use `--auth-type=legacy`:**
+
+```bash
+npm publish --access public --auth-type=legacy
+```
+
+The default web flow prints an `npmjs.com/auth/cli/<uuid>` link that 404s instead of
+redirecting to login ([npm/cli#6242](https://github.com/npm/cli/issues/6242), closed as
+registry-side). `legacy` restores the in-terminal OTP prompt and sidesteps it.
+
+`publish.yml` skips publishing when the version is already on the registry, so re-running a
+tag is safe and the bootstrapped `v0.1.0` tag does not fail. Note that `0.1.0` carries no
+provenance badge on npmjs.com -- that starts with the first OIDC-published version.
 
 ## TODO
 
-- [ ] Publish 0.1.0 manually, then configure the trusted publisher on npmjs.com.
+- [x] Publish 0.1.0 manually (done, via `--auth-type=legacy`).
+- [ ] Attach OIDC: `npm trust github @pearpages/credit --file publish.yml --repo pearpages/credit --allow-publish`, then push the `v0.1.0` tag.
 - [ ] Step 2 — migrate orchard: six `AuthorCard` call sites (all pass taglines), then
       repoint the ten non-footer icon consumers at `@pearpages/credit/icon.png` and delete
       `packages/assets/pearpages-icon.png`. Re-run `pnpm sites:a11y`.

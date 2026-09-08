@@ -52,9 +52,25 @@ jobs:
         if: steps.check_branch.outputs.is_main_branch == 'true'
         run: npm run check:package
 
+      # 0.1.0 was published by hand to bootstrap trusted publishing (npm cannot
+      # attach a trusted publisher to a package that does not exist yet -- see
+      # npm/cli#8544), so its tag would otherwise fail here on a duplicate
+      # version. This also makes re-running any tag safe.
+      - name: Skip if this version is already published
+        id: published
+        if: steps.check_branch.outputs.is_main_branch == 'true'
+        run: |
+          V=$(node -p "require('./package.json').version")
+          if npm view "@pearpages/credit@$V" version >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "::notice::@pearpages/credit@$V is already on npm - nothing to publish."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       # No NODE_AUTH_TOKEN: npm authenticates via OIDC against the trusted
       # publisher configured on npmjs.com, and emits provenance by itself, so
       # --provenance is redundant.
       - name: Publish
-        if: steps.check_branch.outputs.is_main_branch == 'true'
+        if: steps.check_branch.outputs.is_main_branch == 'true' && steps.published.outputs.skip == 'false'
         run: npm publish --access public
