@@ -46,8 +46,10 @@ the stylesheet into the JS, which is the one thing this package exists to preven
 
 ### Plain HTML
 
+No component and no script — one stylesheet, six tags:
+
 ```html
-<link rel="stylesheet" href="/path/to/@pearpages/credit/dist/credit.css" />
+<link rel="stylesheet" href="https://unpkg.com/@pearpages/credit@0/dist/credit.css" />
 
 <footer class="sk-author">
   <p class="sk-author__credit">
@@ -56,6 +58,49 @@ the stylesheet into the JS, which is the one thing this package exists to preven
   </p>
 </footer>
 ```
+
+`@0` tracks the latest `0.x`, so the styling and the pear stay current without anyone
+editing the page. A site that installs from npm can point at
+`/node_modules/@pearpages/credit/dist/credit.css` instead.
+
+**With a tagline** — a plain sibling after the credit line, which is what `children` and
+`<slot />` emit. It takes no class of its own; it inherits the centring, colour and size
+from `.sk-author`.
+
+```html
+<footer class="sk-author">
+  <p class="sk-author__credit">
+    <span class="sk-author__icon" aria-hidden="true"></span>
+    Made by <a href="https://pearpages.com">pearpages</a>
+  </p>
+  <p>Open source, no analytics, one orchard.</p>
+</footer>
+```
+
+**Inside an existing `<footer>`** — swap the outer tag for a `<div>`, for the reason given
+under [Props](#props). No rule in the stylesheet selects an element, so this is a one-word
+change and nothing else moves.
+
+```html
+<div class="sk-author">
+  <p class="sk-author__credit">
+    <span class="sk-author__icon" aria-hidden="true"></span>
+    Made by <a href="https://pearpages.com">pearpages</a>
+  </p>
+</div>
+```
+
+Two things the stylesheet cannot survive:
+
+- **Leave the icon `<span>` empty.** The pear is a CSS `background`, not an `<img>`, so an
+  `<img class="sk-author__icon">` paints it behind a broken `src`.
+- **Keep `.sk-author__credit` to one link.** The rule is the descendant selector
+  `.sk-author__credit a`, so a second link there silently takes the bold and the accent
+  underline.
+
+These snippets are not decoration: `src/plain-html.test.ts` parses them out of this file
+and asserts them against the same contract as the React component, so they cannot drift
+from it.
 
 ## Props
 

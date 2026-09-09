@@ -13,6 +13,7 @@ that are easy to undo by accident.
 | `src/pearpages-icon.png` | 5346 B, orchard's exact bytes, for the `./icon.png` export |
 | `src/react.tsx` | ~15-line wrapper, built by tsup |
 | `src/astro/Credit.astro` | ~15-line wrapper, **shipped as source** — Astro components are compiled by the consuming project |
+| `src/canonical-markup.ts` | the markup contract, asserted against **both** React and the README snippet. Test-only; never shipped |
 | `scripts/build-css.mjs` | base64 + substitute. No dependencies, by design |
 
 ## Decisions that look wrong until you know why
@@ -22,6 +23,23 @@ that are easy to undo by accident.
 makes one stylesheet serve Astro, React and plain HTML identically, and it keeps the
 plain-HTML snippet six lines instead of 7 kB of base64. The icon is decorative
 (`aria-hidden`), so nothing is lost.
+
+**Plain-HTML sites get a documented snippet, not a web component.** It was the obvious
+candidate and `PLAN.md` rejects it in full (lines 70–82): a custom element renders
+client-side, so the attribution link would be missing from the built HTML and gone without
+JS; it puts a script on Astro sites that ship none; and shadow DOM turns `--sk-accent` from
+a CSS custom property into an API you have to design. Declarative Shadow DOM fixes only the
+first, and only if something emits it at build time — which means a framework component
+anyway. So plain HTML loads the same `dist/credit.css` and hand-writes six tags.
+
+**The README's plain-HTML snippets are tested, not prose.** `src/plain-html.test.ts` slices
+the `### Plain HTML` section, pulls every ```` ```html ```` fence out of it, and runs each
+through `expectCanonicalMarkup` — the same helper `src/react.test.tsx` uses. Three fences
+are expected (base, tagline, `div`); **adding a fourth fails the count assertion until you
+add its expectation to the `expected` array.** That is deliberate: a snippet nobody asserts
+is exactly how the markup drifted before this package existed. The README links
+`https://unpkg.com/@pearpages/credit@0/dist/credit.css` — the `@0` range, not a pin, so the
+URL neither goes dead between releases nor needs editing at each one.
 
 **The build order is `tsup && node scripts/build-css.mjs`, never the reverse.** tsup runs
 with `clean: true` and will delete a `dist/credit.css` written before it.
@@ -56,8 +74,16 @@ Re-run for 0.2.0 (the brand rename):
 
 - `npm run build && npm run test:run && npm run lint && npm run check:package` all clean;
   publint "All good!", attw green on the `./react` entrypoint.
-- `npm pack --dry-run` → 10 files, 15.6 kB. Both icons ship (for `./icon.*`); the
-  stylesheet references neither.
+- `npm pack --dry-run` → 10 files, 16.5 kB. Both icons ship (for `./icon.*`); the
+  stylesheet references neither. (It was 15.6 kB before the README grew a fuller
+  plain-HTML section; `src/canonical-markup.ts` and `src/plain-html.test.ts` do not ship,
+  since `files` lists `dist` and `src/astro` only.)
+- The README's three plain-HTML fences are asserted against the React markup. Mutation-
+  checked, not merely green: renaming the link text, swapping the icon `<span>` for an
+  `<img>`, adding a second link inside `.sk-author__credit`, and adding a fourth fence each
+  fail the suite.
+- `curl -sSL https://unpkg.com/@pearpages/credit@0/dist/credit.css` → 200, 4176 B,
+  `text/css`, resolving to 0.2.0, with the data URI and the `:hover` rule present.
 
 Carried over from 0.1.0 — 0.2.0 changed one text string and some comments, so nothing
 below can have moved:
