@@ -117,13 +117,31 @@ cwebp -q 90 -alpha_q 100 src/pearpages-icon.png -o src/pearpages-icon.webp
 | push to `main` | nothing publishes |
 | push a `v*` tag | `publish.yml` builds, tests, and publishes to npm |
 
+The trigger is the **push**, not the tag. `git tag` alone leaves the tag in your local
+repo where GitHub never sees it, and no run starts.
+
 ```bash
-npm version minor
+npm version minor                # bumps package.json and creates an annotated tag
 git push --follow-tags
 ```
 
+Tagging by hand instead? Make it annotated. `--follow-tags` carries annotated tags only
+and skips lightweight ones without saying so:
+
+```bash
+git tag -a v0.2.0 -m "v0.2.0"
+git push origin main
+git push origin v0.2.0
+```
+
 Publishing uses npm trusted publishing (OIDC), so there is no token in the repo. The
-workflow skips — greenly — if the tag is not an ancestor of `main`.
+workflow skips — greenly — if the tag is not an ancestor of `main`, or if the version is
+already on the registry. **A green run is therefore not proof of a publish**; confirm on
+the registry:
+
+```bash
+npm view @pearpages/credit@0.2.0 version
+```
 
 ## License
 
