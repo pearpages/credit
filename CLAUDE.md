@@ -101,30 +101,26 @@ below can have moved:
 `forced-colors: active` was not exercised — the `@media` rule that collapses the icon ships
 as a defensive measure. Check it in DevTools → Rendering if it ever matters.
 
-`publish.yml` has never run — see Releasing.
-
 ## Releasing
 
 `main` publishes nothing. A `v*` tag runs `.github/workflows/publish.yml`, which uses npm
 trusted publishing (OIDC) — no token in the repo — and skips greenly if the tag is not an
 ancestor of `main`.
 
-**No tag has ever been pushed, so `publish.yml` has never executed.** The local `v0.1.0`
-tag at `c27e214` never left the machine — 0.1.0 went out by hand, so nothing needed it.
-Nothing in the workflow is battle-tested; in particular the `git merge-base --is-ancestor`
-check assumes `actions/checkout@v4` at `fetch-depth: 0` creates `refs/remotes/origin/main`.
-That should hold, but it is unverified here. Pushing the existing `v0.1.0` tag is a free
-smoke test: 0.1.0 is already on npm, so a correct run goes green and publishes nothing.
+**`publish.yml` works.** Run [34327520383](https://github.com/pearpages/credit/actions/runs/34327520383)
+went green in 45 s on the annotated `v0.2.0` tag and published 0.2.0 at
+2026-09-09T08:12Z. `npm view @pearpages/credit@0.2.0 dist` shows an `attestations` key, so
+OIDC trusted publishing is attached and provenance is real. The `git merge-base
+--is-ancestor` check held, which confirms `actions/checkout@v4` at `fetch-depth: 0` does
+create `refs/remotes/origin/main`.
 
 The trigger is the **push**, not the tag, and `git push --follow-tags` moves *annotated*
-tags only. The one tag this repo has is lightweight — `git for-each-ref refs/tags` reports
-its objecttype as `commit`, not `tag` — so `--follow-tags` would skip it in silence. Either
-create tags with `git tag -a`, or push them explicitly with `git push origin <tag>`.
+tags only. `v0.2.0` is annotated (`git for-each-ref refs/tags` reports objecttype `tag`);
+`v0.1.0` is lightweight, and remains local-only — `--follow-tags` skips it in silence.
+Either create tags with `git tag -a`, or push them explicitly with `git push origin <tag>`.
 
-**0.2.0 is bumped in `package.json` but unpublished, and no `v0.2.0` tag exists.** It
-renames the rendered credit to "Made by pearpages" (it previously used the full personal
-name) — visible output, hence minor rather than patch. Tag it only after the OIDC TODO
-below is closed; until then a tag push would fail on auth.
+0.1.0 carries no provenance badge on npmjs.com — that started with 0.2.0, the first
+OIDC-published version.
 
 0.1.0 was published manually to bootstrap this: npm cannot attach a trusted publisher to a
 package that does not exist yet ([npm/cli#8544](https://github.com/npm/cli/issues/8544) is
@@ -141,45 +137,22 @@ redirecting to login ([npm/cli#6242](https://github.com/npm/cli/issues/6242), cl
 registry-side). `legacy` restores the in-terminal OTP prompt and sidesteps it.
 
 `publish.yml` skips publishing when the version is already on the registry, so re-running a
-tag is safe and the bootstrapped `v0.1.0` tag does not fail. Note that `0.1.0` carries no
-provenance badge on npmjs.com -- that starts with the first OIDC-published version.
+tag is safe and the bootstrapped `v0.1.0` tag does not fail.
 
 ## TODO
 
 - [x] Publish 0.1.0 manually (done, via `--auth-type=legacy`).
-- [ ] Smoke-test the workflow by pushing the tag that already exists. Needs no OIDC and
-      cannot publish anything — 0.1.0 is on the registry, so the run should go green with
-      a *"already on npm - nothing to publish"* notice. This is the first exercise the
-      workflow has ever had.
+- [x] Attach OIDC and release 0.2.0 (done 2026-09-09). The `v0.2.0` tag push ran
+      `publish.yml` green in 45 s and published with provenance — see Releasing. This
+      subsumed the never-needed `v0.1.0` smoke test; that tag is still local-only and
+      pushing it now would only prove the skip path.
 
-      ```bash
-      git push origin v0.1.0
-      gh run watch
-      ```
+      Note `npm trust` does not exist in npm 10.9.8 (`Unknown command: "trust"`), so the
+      command previously recorded here could not have worked as written. If the trusted
+      publisher ever needs re-attaching, do it in the npmjs.com package settings UI.
 
-- [ ] Attach OIDC. `npm trust` needs an OTP just like `npm publish`, so it takes the same
-      `--auth-type=legacy` workaround:
-
-      ```bash
-      npm trust github @pearpages/credit --file publish.yml \
-        --repo pearpages/credit --allow-publish --auth-type=legacy
-      npm trust list @pearpages/credit     # verify it registered
-      ```
-
-      Note what npm warns during this: *anyone with write access to the GitHub repo can
-      publish*. Fine for a solo public repo; reconsider if collaborators are ever added.
-
-- [ ] Release 0.2.0 — **after** OIDC is attached, or the run fails at `npm publish` on
-      missing credentials and the tag has to be deleted and re-pushed. Do not run
-      `npm version`: `package.json` is already at 0.2.0 and it would overshoot to 0.3.0.
-
-      ```bash
-      git push origin main
-      git tag -a v0.2.0 -m "v0.2.0"
-      git push origin v0.2.0
-      gh run watch
-      npm view @pearpages/credit@0.2.0 dist   # an `attestations` key = OIDC provenance
-      ```
+      npm's warning at attach time still applies: *anyone with write access to the GitHub
+      repo can publish*. Fine for a solo public repo; reconsider if collaborators are added.
 
 - [ ] Step 2 — migrate orchard: six `AuthorCard` call sites (all pass taglines), then
       repoint the ten non-footer icon consumers at `@pearpages/credit/icon.png` and delete
