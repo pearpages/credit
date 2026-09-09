@@ -5,7 +5,7 @@
 
 # Credit
 
-The shared "Made by Pere Pages" footer — one stylesheet, plus a thin wrapper for React and
+The shared "Made by pearpages" footer — one stylesheet, plus a thin wrapper for React and
 Astro. The pear rides inside the CSS as a data URI, so no site has to resolve an asset path.
 
 ## Installation
@@ -52,7 +52,7 @@ the stylesheet into the JS, which is the one thing this package exists to preven
 <footer class="sk-author">
   <p class="sk-author__credit">
     <span class="sk-author__icon" aria-hidden="true"></span>
-    Made by <a href="https://pearpages.com">Pere Pages</a>
+    Made by <a href="https://pearpages.com">pearpages</a>
   </p>
 </footer>
 ```
@@ -127,4 +127,4 @@ workflow skips — greenly — if the tag is not an ancestor of `main`.
 
 ## License
 
-MIT © Pere Pages
+MIT © pearpages

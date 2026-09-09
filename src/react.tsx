@@ -10,7 +10,7 @@ export interface CreditProps {
 }
 
 /**
- * The shared "Made by Pere Pages" credit.
+ * The shared "Made by pearpages" credit.
  *
  * Requires the stylesheet: `import "@pearpages/credit/credit.css"`.
  */
@@ -19,7 +19,7 @@ export function Credit({ as: Element = "footer", children }: CreditProps) {
     <Element className="sk-author">
       <p className="sk-author__credit">
         <span className="sk-author__icon" aria-hidden="true" />
-        Made by <a href="https://pearpages.com">Pere Pages</a>
+        Made by <a href="https://pearpages.com">pearpages</a>
       </p>
       {children}
     </Element>

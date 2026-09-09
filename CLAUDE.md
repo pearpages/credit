@@ -1,6 +1,6 @@
 # @pearpages/credit
 
-The shared "Made by Pere Pages" footer, published so 26 repos stop re-deriving it by hand.
+The shared "Made by pearpages" footer, published so 26 repos stop re-deriving it by hand.
 `PLAN.md` holds the original rationale; this file holds the conventions and the decisions
 that are easy to undo by accident.
 
@@ -50,12 +50,18 @@ a stylesheet imported purely for its side effect otherwise.
 **React peers are optional.** Astro and plain-HTML consumers should not get a peer warning
 about a framework they do not use.
 
-## Verified at 0.1.0
+## Verified at 0.2.0
+
+Re-run for 0.2.0 (the brand rename):
 
 - `npm run build && npm run test:run && npm run lint && npm run check:package` all clean;
   publint "All good!", attw green on the `./react` entrypoint.
 - `npm pack --dry-run` → 10 files, 15.6 kB. Both icons ship (for `./icon.*`); the
   stylesheet references neither.
+
+Carried over from 0.1.0 — 0.2.0 changed one text string and some comments, so nothing
+below can have moved:
+
 - All five exports resolve from a real `file:` install.
 - Browser: padding `20px 24px 32px`, credit margin `0px 0px 4px`, icon box 22×22, WebP data
   URI, default underline present, `:hover` takes `--sk-accent`, `as="div"` produces no
@@ -74,6 +80,11 @@ as a defensive measure. Check it in DevTools → Rendering if it ever matters.
 `main` publishes nothing. A `v*` tag runs `.github/workflows/publish.yml`, which uses npm
 trusted publishing (OIDC) — no token in the repo — and skips greenly if the tag is not an
 ancestor of `main`.
+
+**0.2.0 is bumped in `package.json` but unpublished, and no `v0.2.0` tag exists.** It
+renames the rendered credit to "Made by pearpages" (it previously used the full personal
+name) — visible output, hence minor rather than patch. Tag it only after the OIDC TODO
+below is closed; until then a tag push would fail on auth.
 
 0.1.0 was published manually to bootstrap this: npm cannot attach a trusted publisher to a
 package that does not exist yet ([npm/cli#8544](https://github.com/npm/cli/issues/8544) is

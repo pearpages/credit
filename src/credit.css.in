@@ -1,5 +1,5 @@
 /*
- * @pearpages/credit — the shared "Made by Pere Pages" footer.
+ * @pearpages/credit — the shared "Made by pearpages" footer.
  *
  * Canonical source. Every consumer loads this same file, which is the point:
  * Astro, React and plain HTML cannot drift from each other if they share it.

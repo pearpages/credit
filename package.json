@@ -1,7 +1,7 @@
 {
   "name": "@pearpages/credit",
-  "version": "0.1.0",
-  "description": "The shared \"Made by Pere Pages\" footer: one stylesheet, plus thin React and Astro wrappers.",
+  "version": "0.2.0",
+  "description": "The shared \"Made by pearpages\" footer: one stylesheet, plus thin React and Astro wrappers.",
   "license": "MIT",
   "repository": {
     "type": "git",

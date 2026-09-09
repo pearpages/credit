@@ -12,9 +12,9 @@ describe("Credit", () => {
 
     const credit = root.querySelector(".sk-author__credit")!;
     expect(credit.tagName).toBe("P");
-    expect(credit).toHaveTextContent("Made by Pere Pages");
+    expect(credit).toHaveTextContent("Made by pearpages");
 
-    const link = screen.getByRole("link", { name: "Pere Pages" });
+    const link = screen.getByRole("link", { name: "pearpages" });
     expect(link).toHaveAttribute("href", "https://pearpages.com");
   });
 

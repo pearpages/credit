@@ -1,6 +1,6 @@
 # `@pearpages/credit` — plan
 
-Extract the shared "Made by Pere Pages" footer into a published package, so 26 repos stop
+Extract the shared "Made by pearpages" footer into a published package, so 26 repos stop
 re-deriving it by hand.
 
 ---
@@ -42,7 +42,7 @@ package amortises easily.
 The footer is **two separate things**:
 
 1. **How it looks** — colours, spacing, the pear icon. That is CSS.
-2. **The tags on the page** — `<footer><p><img> Made by <a>Pere Pages</a></p></footer>`.
+2. **The tags on the page** — `<footer><p><img> Made by <a>pearpages</a></p></footer>`.
    That is HTML.
 
 CSS cannot create HTML; it can only style HTML that already exists. So one file cannot do
